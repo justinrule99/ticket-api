@@ -1,14 +1,20 @@
-import {findEventById, saveEvent, saveFootballEvents} from "../repostitories/event-repository.js";
+import {findAllEvents, findEventById, saveEvent, saveFootballEvents} from "../repostitories/event-repository.js";
 import {getFootballEvents} from "../utils/parse-events.js";
 
 
 // do req, res callback here
 export const getAllEvents = async (req, res) => {
 
-    const football = getFootballEvents();
+    try {
+        const football = await findAllEvents();
 
-    res.send('hello from service');
-    return 'hello';
+        return res.json(football);
+    } catch(err) {
+        console.log(err);
+        return res.status(500).send({
+            message: 'Error: Could not retrieve events.'
+        });
+    }
 }
 
 export const getEventByDate = async (req, res) => {

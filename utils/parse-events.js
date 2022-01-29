@@ -4,6 +4,8 @@ import moment from 'moment';
 // util for parsing html into event objects
 
 // standardize for all formats of this type
+// update with correct year and AM/PM
+// if nov or dec, 2021. else 2022
 export const getFootballEvents = async () => {
     const {data} = await axios.get('https://cyclones.com/services/schedule_txt.ashx?schedule=1184');
     // const {data} = await axios.get('https://www.kstatesports.com/services/schedule_txt.ashx?schedule=2540');
@@ -34,8 +36,16 @@ export const getFootballEvents = async () => {
         if (timeOnly !== 'TBA' && timeOnly !== 'TBD') {
             const split = timeOnly.split(':');
             h = parseInt(split[0]);
+            if (h !== 11) {
+                h += 12;
+            }
             m = parseInt(split[1]);
         }
+
+        // let year = 2022;
+        // if (dateOnly.substring(0,3) === 'Nov' || dateOnly.substring(0,3) === 'Dec') {
+        //     year = 2021;
+        // }
 
         const dateBuilder = moment()
             .year(2021)

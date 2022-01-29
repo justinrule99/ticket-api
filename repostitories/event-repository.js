@@ -3,6 +3,10 @@ import {getFootballEvents} from "../utils/parse-events.js";
 
 const knex = getDBConnection();
 
+export const findAllEvents = () => {
+    return knex('events').where({home: true});
+}
+
 export const findEventById = (id) => {
     // knex call here - inject db client
 

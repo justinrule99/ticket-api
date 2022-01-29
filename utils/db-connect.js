@@ -1,15 +1,22 @@
 import knex from 'knex';
 import {DB_PASSWORD, DB_USER, PI_HOST, dev, LOCALHOST} from "../env.js";
 
-export const getDBConnection = () => knex({
-    client: 'mysql',
-    connection: {
-        host: dev ? LOCALHOST : PI_HOST,
-        user: DB_USER,
-        password: DB_PASSWORD,
-        database: 'ticket_db'
-    }
-});
+let dbConnection;
+
+export const getDBConnection = () => {
+    if (dbConnection) return dbConnection;
+
+    return knex({
+        client: 'mysql',
+        connection: {
+            host: dev ? LOCALHOST : PI_HOST,
+            user: DB_USER,
+            password: DB_PASSWORD,
+            database: 'ticket_db',
+            dateStrings: true
+        }
+    })
+}
 
 // require auth later
 export const adminFunction = async (req, res) => {
@@ -56,13 +63,20 @@ const createEvents = (db) => db.schema.createTable('events', (table) => {
         .defaultTo(db.fn.now());
 });
 
+export const tempCreateTickets = async () => {
+    const connection = getDBConnection();
+    await createTickets(connection);
+
+}
+
+// some foreign key errors. is float incorrect?
 const createTickets = (db) => db.schema.createTable('tickets', (table) => {
-    table.increments();
+    table.increments().primary();
     table.integer('event')
         .references("id")
         .inTable("events")
         .onDelete("CASCADE");
-    table.decimal('price', 2, 2);
+    table.float('price');
     table.boolean('is_active')
         .defaultTo(true);
     table.integer('seller')
